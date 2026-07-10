@@ -1,0 +1,52 @@
+import streamlit as st
+
+from utils import analyze_resume
+
+
+st.set_page_config(
+    page_title="AI Resume Analyzer",
+    layout="wide"
+)
+
+
+st.title("🤖 AI Resume Analyzer")
+
+
+uploaded_file = st.file_uploader(
+    "Upload Resume PDF",
+    type=["pdf"]
+)
+
+
+job_description = st.text_area(
+    "Paste Job Description",
+    height=250,
+    placeholder="Enter the job description here..."
+)
+
+
+
+# if uploaded_file and job_description:
+
+
+if st.button("Analyze Resume"):
+    with st.spinner("Analyzing resume..."):
+
+
+            result = analyze_resume(
+                uploaded_file,
+                job_description
+            )
+
+
+            st.session_state["result"] = result
+
+
+            st.success(
+                "Analysis completed"
+            )
+
+
+            st.switch_page(
+                "pages/results.py"
+            )
