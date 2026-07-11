@@ -25,34 +25,36 @@ st.header(
 "AI Feedback"
 )
 
-analysis=result["analysis"]
+st.write(result)
+
+# analysis=result["analysis"]
 
 
 
-# Remove markdown code block markers
-analysis = analysis.replace("```json", "").replace("```", "").strip()
+# # Remove markdown code block markers
+# analysis = analysis.replace("```json", "").replace("```", "").strip()
 
-# Convert JSON string to dict
-analysis = json.loads(analysis)
+# # Convert JSON string to dict
+# analysis = json.loads(analysis)
 
-st.subheader("Resume Score")
-st.write(analysis["score"])
-st.subheader("Skills")
-for i in analysis["skills"]:
-    st.write(
-             "✅",
-             i
-         )
-st.subheader("Missing Skills")
-for i in analysis["missing_skills"]:
-    st.write(
-             "⚠️",
-             i
-         )
-st.subheader("Experience Analysis")
-st.write(analysis["experience_analysis"])
-st.subheader("Suggestions")
-st.write(analysis["suggestions"])
+# st.subheader("Resume Score")
+# st.write(analysis["score"])
+# st.subheader("Skills")
+# for i in analysis["skills"]:
+#     st.write(
+#              "✅",
+#              i
+#          )
+# st.subheader("Missing Skills")
+# for i in analysis["missing_skills"]:
+#     st.write(
+#              "⚠️",
+#              i
+#          )
+# st.subheader("Experience Analysis")
+# st.write(analysis["experience_analysis"])
+# st.subheader("Suggestions")
+# st.write(analysis["suggestions"])
 
 
 
