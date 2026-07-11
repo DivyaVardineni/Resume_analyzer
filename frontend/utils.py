@@ -1,7 +1,7 @@
 import requests
+import streamlit as st
 
-
-BACKEND_URL="http://localhost:8000/api"
+BACKEND_URL=st.secrets["backend_url"]
 
 
 
