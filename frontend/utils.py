@@ -31,9 +31,5 @@ def analyze_resume(file, job_description):
         }
 
     )
-    print("STATUS CODE:", response.status_code)
-
-    print("RAW RESPONSE:")
-    print(response.text)
-
+    response.raise_for_status()
     return response.json()
