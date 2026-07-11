@@ -10,7 +10,7 @@ def analyze_resume(file, job_description):
 
     response=requests.post(
 
-        f"{BACKEND_URL}/analyze",
+        f"{BACKEND_URL}/api/analyze",
 
         files={
 
