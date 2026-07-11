@@ -1,19 +1,13 @@
 import os
-
+import uuid
 
 from PyPDF2 import PdfReader
 
-
-from langchain_text_splitters import (
-    RecursiveCharacterTextSplitter
-)
-
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from langchain_groq import ChatGroq
 
-
 from pinecone import Pinecone
-
 
 
 from config import (
@@ -23,18 +17,53 @@ from config import (
 )
 
 
-from prompt.analyze_prompt import (
-    RESUME_ANALYZER_PROMPT
-)
+from prompt.analyze_prompt import RESUME_ANALYZER_PROMPT
 
 
+
+# =========================
+# LAZY LOAD PINECONE
+# =========================
+
+def get_pinecone():
+
+    return Pinecone(
+        api_key=PINECONE_API_KEY
+    )
+
+
+
+def get_index():
+
+    pc = get_pinecone()
+
+    return pc.Index(
+        PINECONE_INDEX
+    )
+
+
+
+# =========================
+# LAZY LOAD LLM
+# =========================
+
+def get_llm():
+
+    return ChatGroq(
+
+        api_key=GROQ_API_KEY,
+
+        model="llama-3.1-8b-instant",
+
+        temperature=0
+
+    )
 
 
 
 # =========================
 # PDF EXTRACTION
 # =========================
-
 
 def extract_pdf(file_path):
 
@@ -58,9 +87,7 @@ def extract_pdf(file_path):
             text += page_text
 
 
-
     return text
-
 
 
 
@@ -68,7 +95,6 @@ def extract_pdf(file_path):
 # =========================
 # TEXT CHUNKING
 # =========================
-
 
 def split_documents(text):
 
@@ -82,52 +108,25 @@ def split_documents(text):
     )
 
 
-    chunks = splitter.split_text(
-        text
-    )
-
-
-    return chunks
-
+    return splitter.split_text(text)
 
 
 
 
 # =========================
-# PINECONE
+# CREATE EMBEDDINGS
 # =========================
-
-
-pc = Pinecone(
-
-    api_key=PINECONE_API_KEY
-
-)
-
-
-
-index = pc.Index(
-
-    PINECONE_INDEX
-
-)
-
-
-
-
-
-# =========================
-# EMBEDDING CREATION
-# =========================
-
 
 def create_embeddings(chunks):
 
 
-    vectors=[]
+    pc = get_pinecone()
 
 
-    for i,chunk in enumerate(chunks):
+    vectors = []
+
+
+    for chunk in chunks:
 
 
         response = pc.inference.embed(
@@ -151,12 +150,11 @@ def create_embeddings(chunks):
 
             {
 
-                "id":str(i),
+                "id": str(uuid.uuid4()),
 
-                "vector":
-                response[0]["values"],
+                "vector": response[0]["values"],
 
-                "text":chunk
+                "text": chunk
 
             }
 
@@ -168,16 +166,17 @@ def create_embeddings(chunks):
 
 
 
-
 # =========================
 # STORE VECTORS
 # =========================
 
-
 def store_vectors(vectors):
 
 
-    data=[]
+    index = get_index()
+
+
+    data = []
 
 
     for item in vectors:
@@ -187,27 +186,21 @@ def store_vectors(vectors):
 
             {
 
-                "id":
-                item["id"],
+                "id": item["id"],
 
-
-                "values":
-                item["vector"],
-
+                "values": item["vector"],
 
                 "metadata":
 
                 {
 
-                    "text":
-                    item["text"]
+                    "text": item["text"]
 
                 }
 
             }
 
         )
-
 
 
     index.upsert(
@@ -224,11 +217,13 @@ def store_vectors(vectors):
 # SEARCH
 # =========================
 
+def search_vectors(query,k=5):
 
-def search_vectors(
-    query,
-    k=5
-):
+
+    pc = get_pinecone()
+
+    index = get_index()
+
 
 
     response = pc.inference.embed(
@@ -263,8 +258,8 @@ def search_vectors(
     )
 
 
-    documents=[]
 
+    documents=[]
 
 
     for match in result.matches:
@@ -277,7 +272,6 @@ def search_vectors(
         )
 
 
-
     return documents
 
 
@@ -285,31 +279,13 @@ def search_vectors(
 
 
 # =========================
-# LLM
+# LLM RESPONSE
 # =========================
 
-
-llm = ChatGroq(
-
-    api_key=GROQ_API_KEY,
-
-    model="llama-3.1-8b-instant",
-
-    temperature=0
-
-)
+def generate_answer(context, job_description):
 
 
-
-
-
-def generate_answer(
-
-    context,
-
-    job_description
-
-):
+    llm = get_llm()
 
 
     prompt = RESUME_ANALYZER_PROMPT.format(
@@ -319,7 +295,6 @@ def generate_answer(
         job_description=job_description
 
     )
-
 
 
     response = llm.invoke(
@@ -334,19 +309,11 @@ def generate_answer(
 
 
 
-
 # =========================
 # COMPLETE PIPELINE
 # =========================
 
-
-def analyze_resume(
-
-    file,
-
-    job_description
-
-):
+def analyze_resume(file, job_description):
 
 
     os.makedirs(
@@ -358,93 +325,104 @@ def analyze_resume(
     )
 
 
-
     path = f"uploads/{file.filename}"
 
 
 
-    with open(path,"wb") as f:
+    try:
 
 
-        f.write(
+        with open(path,"wb") as f:
 
-            file.file.read()
+
+            f.write(
+
+                file.file.read()
+
+            )
+
+
+
+        # Extract PDF
+
+        text = extract_pdf(
+
+            path
 
         )
 
 
 
+        # Split
 
-    # Extract Resume
+        chunks = split_documents(
 
-    text = extract_pdf(
+            text
 
-        path
-
-    )
-
-
-
-    # Split
-
-    chunks = split_documents(
-
-        text
-
-    )
+        )
 
 
 
-    # Embeddings
+        # Embeddings
 
-    vectors = create_embeddings(
+        vectors = create_embeddings(
 
-        chunks
+            chunks
 
-    )
-
-
-
-    # Store
-
-    store_vectors(
-
-        vectors
-
-    )
+        )
 
 
 
-    # Retrieve
+        # Store
 
-    docs = search_vectors(
+        store_vectors(
 
-        "skills experience projects education",
+            vectors
 
-        k=5
-
-    )
+        )
 
 
 
-    context = "\n\n".join(
+        # Retrieve
 
-        docs
+        docs = search_vectors(
 
-    )
+            "skills experience projects education",
 
+            k=5
 
-
-    # LLM Analysis
-
-    result = generate_answer(
-
-        context,
-
-        job_description
-
-    )
+        )
 
 
 
-    return result
+        context = "\n\n".join(
+
+            docs
+
+        )
+
+
+
+        # Generate answer
+
+        result = generate_answer(
+
+            context,
+
+            job_description
+
+        )
+
+
+        return result
+
+
+
+    finally:
+
+
+        # Delete uploaded file
+
+        if os.path.exists(path):
+
+            os.remove(path)
