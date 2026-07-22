@@ -147,9 +147,24 @@ st.subheader(
     "Suggestions"
 )
 
-st.write(
-    analysis.get(
-        "suggestions",
-        "N/A"
-    )
+
+suggestions = analysis.get(
+    "suggestions",
+    "N/A"
 )
+
+
+if isinstance(suggestions, list):
+
+    for suggestion in suggestions:
+
+        st.write(
+            "💡",
+            suggestion
+        )
+
+else:
+
+    st.write(
+        suggestions
+    )
