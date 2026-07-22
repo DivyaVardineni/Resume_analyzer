@@ -171,5 +171,5 @@ else:
 
 if st.button("Back"):
     st.switch_page(
-                "app.py"
+               "pages/app.py"
             )

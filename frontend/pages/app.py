@@ -68,22 +68,3 @@ if st.button("Analyze Resume"):
 
 
 
-# st.markdown(
-# """
-# ## Welcome to AI Resume Analyzer
-
-# Features:
-
-# ✅ Resume PDF Upload
-
-# ✅ AI Resume Scoring
-
-# ✅ Skill Extraction
-
-# ✅ Missing Skill Detection
-
-# ✅ Career Suggestions
-
-# Navigate to upload your resume.
-# """
-# )
