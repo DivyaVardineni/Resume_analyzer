@@ -4,7 +4,7 @@ import json
 
 
 st.title(
-    "📊 Resume Analysis Result"
+    "Resume Analysis Result"
 )
 
 
