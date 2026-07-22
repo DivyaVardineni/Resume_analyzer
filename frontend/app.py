@@ -26,16 +26,34 @@ job_description = st.text_area(
 
 
 
-# if uploaded_file and job_description:
-
-
 if st.button("Analyze Resume"):
-    with st.spinner("Analyzing resume..."):
+
+
+    if uploaded_file is None:
+
+        st.warning(
+            "Please upload a resume PDF."
+        )
+
+
+    elif not job_description.strip():
+
+        st.warning(
+            "Please enter a job description."
+        )
+
+
+    else:
+
+        with st.spinner("Analyzing resume..."):
 
 
             result = analyze_resume(
+
                 uploaded_file,
+
                 job_description
+
             )
 
 

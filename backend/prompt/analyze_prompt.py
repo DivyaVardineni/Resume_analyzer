@@ -3,7 +3,8 @@ RESUME_ANALYZER_PROMPT = """
 You are an expert technical recruiter and ATS resume analyzer.
 
 
-Your task is to compare the resume with the given job description.
+Your task is to analyze the candidate resume against the given job description.
+
 
 
 ========================
@@ -22,47 +23,49 @@ JOB DESCRIPTION
 
 
 
-Analyze:
+Analyze the resume based on the job description:
 
+1. Calculate ATS match score (0-100).
 
-1. Resume score based on job description match.
+2. Extract technical skills that are actually present in the resume.
 
-2. Technical skills available in resume.
+3. Identify important skills required in the job description but missing from the resume.
 
-3. Missing skills required for this job.
+4. Analyze projects, experience, and their relevance to the job role.
 
-4. Experience and project relevance.
-
-5. Resume improvement suggestions.
+5. Provide practical resume improvement suggestions.
 
 
 
 Return ONLY valid JSON.
 
+Do not add markdown.
+Do not add explanations outside JSON.
 
 
-Format:
+
+Required JSON format:
 
 
 {{
-    "score":85,
+    "score": 85,
 
-    "skills":[
+    "skills": [
         "Python",
         "FastAPI",
         "SQL"
     ],
 
-    "missing_skills":[
+    "missing_skills": [
         "Docker",
         "AWS"
     ],
 
     "experience_analysis":
-    "Explain candidate experience and project relevance",
+    "Explain how the candidate experience and projects match the job requirements.",
 
     "suggestions":
-    "Give actionable improvements"
+    "Provide actionable improvements for increasing ATS score."
 }}
 
 
@@ -70,9 +73,10 @@ Format:
 Rules:
 
 - Do not hallucinate skills.
-- Only mention skills present in resume.
-- Compare resume with job description.
+- Only include skills clearly mentioned in the resume.
+- Compare resume content only with the provided job description.
+- If a skill is not present in the resume, do not add it to skills.
 - Give realistic ATS feedback.
-- Focus on software engineering and AI roles.
+- Focus on software engineering, backend, and AI/ML roles.
 
 """

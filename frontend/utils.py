@@ -1,14 +1,15 @@
 import requests
 import streamlit as st
 
-BACKEND_URL=st.secrets["backend_url"]
+
+BACKEND_URL = st.secrets["backend_url"]
 
 
 
 def analyze_resume(file, job_description):
 
 
-    response=requests.post(
+    response = requests.post(
 
         f"{BACKEND_URL}/api/analyze",
 
@@ -31,5 +32,16 @@ def analyze_resume(file, job_description):
         }
 
     )
-    response.raise_for_status()
+
+
+    if response.status_code != 200:
+
+        st.error(
+            f"Backend Error: {response.text}"
+        )
+
+        return None
+
+
+
     return response.json()
