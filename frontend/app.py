@@ -9,62 +9,90 @@ st.set_page_config(
 )
 
 
-st.title("🤖 AI Resume Analyzer")
+st.title("Resume Analyzer Home")
 
 
-uploaded_file = st.file_uploader(
-    "Upload Resume PDF",
-    type=["pdf"]
+
+st.markdown(
+"""
+## Welcome to AI Resume Analyzer
+
+Features:
+
+✅ Resume PDF Upload
+
+✅ AI Resume Scoring
+
+✅ Skill Extraction
+
+✅ Missing Skill Detection
+
+✅ Career Suggestions
+
+Navigate to upload your resume.
+"""
 )
 
 
-job_description = st.text_area(
-    "Paste Job Description",
-    height=250,
-    placeholder="Enter the job description here..."
-)
+if st.button("Next"):
+    st.switch_page(
+                 "pages/home.py"
+             )
+
+
+# uploaded_file = st.file_uploader(
+#     "Upload Resume PDF",
+#     type=["pdf"]
+# )
+
+
+# job_description = st.text_area(
+#     "Paste Job Description",
+#     height=250,
+#     placeholder="Enter the job description here..."
+# )
 
 
 
-if st.button("Analyze Resume"):
+# if st.button("Analyze Resume"):
 
 
-    if uploaded_file is None:
+#     if uploaded_file is None:
 
-        st.warning(
-            "Please upload a resume PDF."
-        )
-
-
-    elif not job_description.strip():
-
-        st.warning(
-            "Please enter a job description."
-        )
+#         st.warning(
+#             "Please upload a resume PDF."
+#         )
 
 
-    else:
+#     elif not job_description.strip():
 
-        with st.spinner("Analyzing resume..."):
-
-
-            result = analyze_resume(
-
-                uploaded_file,
-
-                job_description
-
-            )
+#         st.warning(
+#             "Please enter a job description."
+#         )
 
 
-            st.session_state["result"] = result
+#     else:
+
+#         with st.spinner("Analyzing resume..."):
 
 
-            st.success(
-                "Analysis completed"
-            )
+#             result = analyze_resume(
+
+#                 uploaded_file,
+
+#                 job_description
+
+#             )
 
 
-            st.switch_page(
-                "pages/results.py"
-            )
+#             st.session_state["result"] = result
+
+
+#             st.success(
+#                 "Analysis completed"
+#             )
+
+
+#             st.switch_page(
+#                 "pages/results.py"
+#             )

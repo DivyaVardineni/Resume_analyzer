@@ -168,3 +168,8 @@ else:
     st.write(
         suggestions
     )
+
+if st.button("Back"):
+    st.switch_page(
+                "app.py"
+            )
